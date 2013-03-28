@@ -80,7 +80,7 @@ class SbatchConfig(HpcConfig):
         self.partition = self.select_answer("Select partition", ["core", "node"])
         self.time = self.validate_input("Specify job running time ([d-]hh:mm:ss)", "(((((([0-9]\-)?[0-9])?[0-9]:)?[0-9])?[0-9]:)?[0-9])?[0-9]")
         self.job_name = self.validate_input("Give a job name", "[a-zA-Z0-9\_\-\.]")
-        self.cores_cnt = self.select_answer("Select number of cores", range(1,8+1))
+        self.cores_cnt = self.validate_input("Select number of cores ...\n(Kalkyl has 8 core per nodes, tintin has 16)", "\d{1,4}")
         if self.partition == "node":        
             self.nodes_cnt = self.validate_input("Select number of nodes (1-348)", "\d{1,3}")
         self.qos_short = self.get_boolean_answer("Add --qos=short flag?")
