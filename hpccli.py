@@ -1,4 +1,5 @@
 import re
+import subprocess as sub
 
 def main():
     sbatch_config = SbatchConfig()
@@ -64,7 +65,8 @@ class SbatchConfig(HpcConfig):
         self.qos_short = False
         
     def show_config_wizard(self):
-        self.project = self.select_answer("Select project", ["staff", "b2011221"])
+        projects = self.get_user_projects()        
+        self.project = self.select_answer("Select project", projects)
         self.partition = self.select_answer("Select partition", ["core", "node"])
         self.time = self.validate_input("Specify job running time ([d-]hh:mm:ss)", "(((((([0-9]\-)?[0-9])?[0-9]:)?[0-9])?[0-9]:)?[0-9])?[0-9]")
         self.job_name = self.validate_input("Give a job name", "[a-zA-Z0-9\_\-\.]")
@@ -112,6 +114,13 @@ class SbatchConfig(HpcConfig):
             print "File successfully saved: %s!" % filename
         except:
             print "Could not save file!"
+
+    def get_user_projects(self):
+        cmd = sub.Popen("groups",stdout=sub.PIPE, stderr=sub.PIPE)
+        stdout, stderrr = cmd.communicate()
+        groups = stdout.strip().split(" ")
+        projects = [g for g in groups if re.match("(staff|[abps][0-9\-]+)", g)]
+        return projects
 
 
 if __name__ == '__main__':
