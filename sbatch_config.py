@@ -1,3 +1,12 @@
+# -----------------------------------------------------------------------
+#
+# Command-line SBATCH Script Configuration Wizard
+#
+# -----------------------------------------------------------------------
+# Author: Samuel Lampa, samuel.lampa@gmail.com, UPPMAX
+# Created: 2013-03-26
+# -----------------------------------------------------------------------
+
 import re
 import subprocess as sub
 
