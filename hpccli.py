@@ -4,7 +4,7 @@ def main():
     sbatch_config = SbatchConfig()
     sbatch_config.show_config_wizard()
     sbatch_config.print_formatted()
-    #sbatch_config.save_to_file()
+    sbatch_config.save_to_file()
 
 class HpcConfig(object):
     def __construct(self):
@@ -66,7 +66,7 @@ class SbatchConfig(HpcConfig):
     def show_config_wizard(self):
         self.project = self.select_answer("Select project", ["staff", "b2011221"])
         self.partition = self.select_answer("Select partition", ["core", "node"])
-        self.time = self.validate_input("Specify job running time ([d-]hh:mm:ss)", "([0-9]\-)?[0-9]{2}:[0-9]{2}:[0-9]{2}")
+        self.time = self.validate_input("Specify job running time ([d-]hh:mm:ss)", "(((((([0-9]\-)?[0-9])?[0-9]:)?[0-9])?[0-9]:)?[0-9])?[0-9]")
         self.job_name = self.validate_input("Give a job name", "[a-zA-Z0-9\_\-\.]")
         self.cores_cnt = self.select_answer("Select number of cores", range(1,8+1))
         if self.partition == "node":        
@@ -74,7 +74,7 @@ class SbatchConfig(HpcConfig):
         self.qos_short = self.get_boolean_answer("Add --qos=short flag?")
         
     def get_formatted(self):
-        output = "\n#!/bin/bash -l\n"
+        output = "#!/bin/bash -l\n"
         output += "#SBATCH -A %s\n" % self.project
         output += "#SBATCH -p %s\n" % self.partition
         output += "#SBATCH -t %s\n" % self.time
@@ -91,7 +91,27 @@ class SbatchConfig(HpcConfig):
         print "-"*80
         print "Below follows the resulting SBATCH script:"
         print "-"*80
-        print sbatch_code        
+        print sbatch_code
+        
+    def save_to_file(self, filename = ""):
+        if filename == "":
+            filename_pat = "[a-zA-Z0-9\_\-\.]+"
+            while not re.match(filename_pat, filename):
+                if filename != "":
+                    print "Invalid filename! Only these characters are allowed:"
+                    print "a-z, A-Z, 0-9, _.-"
+                filename = raw_input("Specify a filename to save the SBATCH code to: ")
+        else:
+            print "Filename: %s" % filename
+        
+        try:        
+            output_text = self.get_formatted() + "\n# Your code here..."
+            outfile = open(filename, "w")
+            outfile.write(output_text)
+            outfile.close()
+            print "File successfully saved: %s!" % filename
+        except:
+            print "Could not save file!"
 
 
 if __name__ == '__main__':
